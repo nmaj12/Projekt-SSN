@@ -41,10 +41,10 @@ class Sleep_Prediction:
         output layers: hours of sleep predicted - 1 layer
     """
 
-    def __init__(self):
+    def __init__(self, hidden_units=128):
         self.input = cols
         self.output = 1
-        self.hidden_units = 128
+        self.hidden_units = hidden_units
 
         # Weights
         self.w1 = np.random.randn(self.input, self.hidden_units)* np.sqrt(2. / self.input)
@@ -119,9 +119,7 @@ class Sleep_Prediction:
         self.w3 = self.w3 - learning_rate * self.v3
         self.b3 = self.b3 - learning_rate * self.db3
 
-    def train(self, X_train, y_train, X_test, y_test, iteration=1000):
-        learning_rate = 0.008
-        batch_size = 32
+    def train(self, X_train, y_train, X_test, y_test, iteration=1000, learning_rate=0.008, batch_size=32):
         rows = X_train.shape[0]
 
         for i in range(iteration):
@@ -231,3 +229,58 @@ def predict_new_users(model, new_data, original_df):
         print(f"User {i + 1}: Predicted {hours[0]*10:.2f} hours of sleep")
 
 predict_new_users(clr, new_samples, real_data)
+
+
+#  PARAMETRIC TESTS (part 2 of the project)
+def test_regression_params():
+    learning_rates = [0.01, 0.008, 0.005, 0.001]
+    hidden_units_list = [64, 128, 256, 512]
+    batch_sizes = [16, 32, 64, 128]
+
+    results = []
+
+    for lr in learning_rates:
+        for hu in hidden_units_list:
+            for bs in batch_sizes:
+
+                print(f"\nTEST: lr={lr}, hidden={hu}, batch={bs}")
+
+                model = Sleep_Prediction(hidden_units = hu)
+
+                # ZMIANA learning rate i batch size w train
+                def custom_train():
+                    X_train = X[:1600]
+                    X_test = X[1600:]
+
+                    y_train = y[:1600]
+                    y_test = y[1600:]
+
+                    model.train(X_train, y_train/10, X_test, y_test/10, iteration=500, learning_rate=lr, batch_size=bs) #zmiana 2 ostatnie dodane zmienne
+
+                    pred = model.predict(X_test)
+                    score = model.score(pred, y_test)
+
+                    return score
+
+                score = custom_train()
+
+                results.append({
+                    "lr": lr,
+                    "hidden": hu,
+                    "batch": bs,
+                    "MAE": score
+                })
+
+    df = pd.DataFrame(results)
+    print("\n=== RESULTS ===")
+    print(df.sort_values("MAE"))
+
+    return df
+
+df_results = test_regression_params()
+
+# === SAVE RESULTS TO FILE
+df_results.to_csv("regression_param_tests_results.csv", index=False)
+
+best_results = df_results.sort_values("MAE").head(10)
+best_results.to_csv("best_results.csv", index=False)
