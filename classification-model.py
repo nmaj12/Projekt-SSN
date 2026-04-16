@@ -23,6 +23,8 @@ data['is_depressed'] = np.where(
     (data['weekly_anxiety_score'] > 0.8),
     1.0, 0.0)
 
+real_data = data.copy()
+
 # TARGET
 y = data['is_depressed'].values.reshape(2000, 1)
 # FEATURES
@@ -39,15 +41,15 @@ class Mentally_Unwell_Prediction:
     output layers: is depressed (0-1) - 1 layer
     """
     # Initialize the model
-    def __init__(self, hidden_units = 128):
+    def __init__(self, hidden_layers = 128):
         self.input = cols
         self.output = 1
-        self.hidden_units = hidden_units
+        self.hidden_units = hidden_layers
 
         # Weights
         self.w1 = np.random.randn(self.input, self.hidden_units)* np.sqrt(2. / self.input)
-        self.w2 = np.random.randn(self.hidden_units, 64)* np.sqrt(2. / self.hidden_units)
-        self.w3 = np.random.randn(64, self.output)* np.sqrt(2. / 64 )
+        self.w2 = np.random.randn(self.hidden_units, (self.hidden_units/2).is_integer())* np.sqrt(2. / self.hidden_units)
+        self.w3 = np.random.randn((self.hidden_units/2).is_integer(), self.output)* np.sqrt(2. / (self.hidden_units/2).is_integer() )
 
         # Velocity
         self.v1 = np.zeros_like(self.w1)
@@ -56,7 +58,7 @@ class Mentally_Unwell_Prediction:
 
         # Biases - initialized to 0
         self.b1 = np.zeros((self.hidden_units, 1))
-        self.b2 = np.zeros((64, 1))
+        self.b2 = np.zeros((((self.hidden_units/2).is_integer()), 1))
         self.b3 = np.zeros((self.output, 1))
 
     # Foward move from input layer through hidden layers, multiplying neuron by weight
@@ -68,16 +70,13 @@ class Mentally_Unwell_Prediction:
         self.a3 = self.ReLU(self.z3)
 
         self.z4 = np.dot(self.w3.T, self.a3) + self.b3
-        self.a4 = self._sigmoid(self.z4)
+        self.a4 = self.sigmoid(self.z4)
 
         return self.a4
 
     # Rectified Linear Unit
-    def ReLU(self, Z):
-        return np.maximum(Z, 0)
-
-    def _sigmoid(self, z):
-        return 1 / (1 + np.exp(-z))
+    def ReLU(self, Z): return np.maximum(Z, 0)
+    def sigmoid(self, z): return 1 / (1 + np.exp(-z))
 
     # Binary Cross Entropy (Log Loss)
     def _loss(self, predict, y):
@@ -90,27 +89,23 @@ class Mentally_Unwell_Prediction:
         predict = self._forward_propagation(X)
         rows = X.shape[0]
 
+        # Output Layer (Sigmoid + BCE)
         dz4 = predict - y.T
-
         self.dw3 = (1 / rows) * np.dot(self.a3, dz4.T)
-        delta3 = np.dot(self.w3, dz4)
-        self.db3 = (1/rows) * np.sum(dz4, axis=1, keepdims=True)
-        dz3 = delta3 * self.ReLU_prime(self.z3)
+        self.db3 = (1 / rows) * np.sum(dz4, axis=1, keepdims=True)
 
+        # Hidden Layer 2 (ReLU)
+        dz3 = np.dot(self.w3, dz4) * self.ReLU_prime(self.z3)
         self.dw2 = (1 / rows) * np.dot(self.a2, dz3.T)
-        delta2 = np.dot(self.w2, dz3)
         self.db2 = (1 / rows) * np.sum(dz3, axis=1, keepdims=True)
-        dz2 = delta2 * self.ReLU_prime(self.z2)
 
+        # Hidden Layer 1 (ReLU)
+        dz2 = np.dot(self.w2, dz3) * self.ReLU_prime(self.z2)
         self.dw1 = (1 / rows) * np.dot(X.T, dz2.T)
-        delta1 = np.dot(self.w1, dz2)
         self.db1 = (1 / rows) * np.sum(dz2, axis=1, keepdims=True)
 
-    def ReLU_prime(self, z):
-        return (z>0).astype(float)
-
-    def _sigmoid_prime(self, z):
-        return self._sigmoid(z) * (1 - self._sigmoid(z))
+    def ReLU_prime(self, z): return (z>0).astype(float)
+    def sigmoid_prime(self, z): return self.sigmoid(z) * (1 - self.sigmoid(z))
 
     def _update(self, learning_rate=0.01):
         beta = 0.9
@@ -126,19 +121,12 @@ class Mentally_Unwell_Prediction:
         self.w3 = self.w3 - learning_rate * self.v3
         self.b3 = self.b3 - learning_rate * self.db3
 
-    def train(self, X, y, iteration=3000, learning_rate = 0.005, batch_size = 40):
+    def train(self, X, y, iteration=1000, learning_rate=0.001, batch_size=32):
         rows = X.shape[0]
 
         for i in range(iteration):
-            idx = np.random.permutation(rows)
-            X_s, y_s = X[idx], y[idx]
-
-            for s in range(0, rows, batch_size):
-                X_b = X_s[s:s + batch_size]
-                y_b = y_s[s:s + batch_size]
-
-                self._backward_propagation(X_b, y_b)
-                self._update(learning_rate)
+            self._backward_propagation(X, y)
+            self._update(learning_rate)
 
             if i % 100 == 0:
                 full_y_hat = self._forward_propagation(X)
@@ -161,12 +149,12 @@ class Mentally_Unwell_Prediction:
         cnt = np.sum(predict == y)
         return (cnt / len(y)) * 100
 
-def train():
-    X_train = X[:1600]
-    X_test = X[1600:]
+def train(seperator=1600):
+    X_train = X[:seperator]
+    X_test = X[seperator:]
 
-    y_train = y[:1600]
-    y_test = y[1600:]
+    y_train = y[:seperator]
+    y_test = y[seperator:]
 
     clr = Mentally_Unwell_Prediction()
 
@@ -176,7 +164,24 @@ def train():
 
     print(f'=== SCORE: {score:.2f}%')
 
+    def show_comparison(model, X_test, y_test):
+        probs = model.predict(X_test)
+        predictions = (probs.T > 0.5).astype(int)
+
+        comparison = pd.DataFrame({
+            'Actual Healthstatus': y_test.flatten(),
+            'Predicted Health status': predictions.flatten()
+        })
+
+        print("\n=== ACTUAL VS PREDICTED ===")
+        print(comparison.tail(10))
+        acc = (comparison['Actual Healthstatus']==comparison['Predicted Health status']).mean()
+        print(f"\nAverage Error: {acc*100:.1f}")
+
+    show_comparison(clr, X_test, y_test)
+
     return clr
+
 
 clr = train()
 
@@ -195,26 +200,31 @@ user_balanced,35,Male,5.0,2.5,2.0,0.5,0.0,1.5,3.0,0.5,0.0,7.5,8,7,3,5.0,Suburban
 
 new_samples = pd.read_csv(io.StringIO(csv_data))
 
+
 def predict_new_users(model, new_data, original_df):
     if 'user_id' in new_data.columns:
         new_data = new_data.drop('user_id', axis=1)
 
     new_data = pd.get_dummies(new_data)
 
-    model_columns = original_df.drop('is_depressed', axis=1).columns
+    train_features = original_df.drop(columns=['is_depressed'])
+    model_columns = train_features.columns
+
     new_data = new_data.reindex(columns=model_columns, fill_value=0)
 
-    orig_features = original_df.drop('is_depressed', axis=1)
-    new_data_scaled = (new_data - orig_features.min()) / (orig_features.max() - orig_features.min())
+    new_data_scaled = (new_data - train_features.mean()) / train_features.std()
 
     X_custom = new_data_scaled.values
     raw_probs = model._forward_propagation(X_custom)
 
+    print("\n=== FINAL TEST RESULTS ===")
     for i, prob in enumerate(raw_probs.T):
-        status = "Unwell" if prob >= 0.5 else "Healty"
-        print(f"Test {i + 1}: Chance for depression: {prob[0] * 100:.2f}% -> Diagnose: {status}")
+        risk = prob[0]
+        status = "Unwell" if risk >= 0.5 else "Healthy"
+        print(f"Test {i + 1}: Health -> Diagnose: {status}")
 
-predict_new_users(clr, new_samples, data)
+predict_new_users(clr, new_samples, real_data)
+
 
 # PARAMETRIC TESTS
 def test_classification_params():
@@ -262,7 +272,7 @@ def test_classification_params():
     print(df.sort_values("accuracy", ascending=False))
 
     # === SAVE RESULTS TO FILE
-    df.to_csv("classification_param_tests.csv", index=False)
+    df.to_csv("test_results/classification/classification_param_tests.csv", index=False)
 
     return df
 
