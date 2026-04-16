@@ -18,7 +18,7 @@ def regression_model_test():
     X = data.drop(columns='sleep_duration_hours').values
 
     class Sleep_Prediction:
-        def __init__(self, layers=[29, 128, 64   , 1], activation='relu'):
+        def __init__(self, layers=[29, 128, 64, 1], activation='relu'):
             self.weights = []
             self.velocity = []
             self.biases = []
@@ -130,7 +130,6 @@ def regression_model_test():
 
     def run_full_analysis():
         results = []
-
         base_arch = [29, 128, 64, 1]
         base_act = 'relu'
         base_lr = 0.005
@@ -202,7 +201,7 @@ def classification_model_test():
     X = data.drop('is_depressed', axis=1).values
 
     class Mentally_Unwell_Prediction:
-        def __init__(self, layers=[29, 128, 64   , 1], activation='relu'):
+        def __init__(self, layers=[29, 128, 64, 1], activation='relu'):
             self.weights = []
             self.velocity = []
             self.biases = []
