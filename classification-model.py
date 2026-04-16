@@ -46,10 +46,13 @@ class Mentally_Unwell_Prediction:
         self.output = 1
         self.hidden_units = hidden_layers
 
+        # ZMIENILAM TEN FRAGMENT BO MI KRZYCZALO ZE TO NIE INT
+        half_units = self.hidden_units // 2
+
         # Weights
-        self.w1 = np.random.randn(self.input, self.hidden_units)* np.sqrt(2. / self.input)
-        self.w2 = np.random.randn(self.hidden_units, (self.hidden_units/2).is_integer())* np.sqrt(2. / self.hidden_units)
-        self.w3 = np.random.randn((self.hidden_units/2).is_integer(), self.output)* np.sqrt(2. / (self.hidden_units/2).is_integer() )
+        self.w1 = np.random.randn(self.input, self.hidden_units) * np.sqrt(2. / self.input)
+        self.w2 = np.random.randn(self.hidden_units, half_units) * np.sqrt(2. / self.hidden_units)
+        self.w3 = np.random.randn(half_units, self.output) * np.sqrt(2. / half_units)
 
         # Velocity
         self.v1 = np.zeros_like(self.w1)
@@ -58,8 +61,9 @@ class Mentally_Unwell_Prediction:
 
         # Biases - initialized to 0
         self.b1 = np.zeros((self.hidden_units, 1))
-        self.b2 = np.zeros((((self.hidden_units/2).is_integer()), 1))
+        self.b2 = np.zeros((half_units, 1))
         self.b3 = np.zeros((self.output, 1))
+        # DO TEGO MIEJSCA
 
     # Foward move from input layer through hidden layers, multiplying neuron by weight
     def _forward_propagation(self, X):
@@ -181,9 +185,24 @@ def train(seperator=1600):
     show_comparison(clr, X_test, y_test)
 
     return clr
+def save_classification_results(model, X_test, y_test):
+    predictions = model.predict(X_test).flatten()
+    actuals = y_test.flatten()
+
+    df_to_save = pd.DataFrame({
+        'Model': ['Custom_Classification_NN'] * len(actuals),
+        'Actual_Status': actuals,
+        'Predicted_Status': predictions,
+        'Correct': (actuals == predictions).astype(int)
+    })
+
+    df_to_save.to_csv("test_models/default_classification_results.csv", index=False)
+    
+    accuracy = (actuals == predictions).mean() * 100
 
 
 clr = train()
+save_classification_results(clr, X[1600:], y[1600:])
 
 # TESTOWANIE MODELU
 import io
@@ -276,5 +295,5 @@ def test_classification_params():
 
     return df
 
-df_class_results = test_classification_params()
-print(df_class_results.sort_values("accuracy", ascending=False).head(10))
+#df_class_results = test_classification_params()
+#print(df_class_results.sort_values("accuracy", ascending=False).head(10))

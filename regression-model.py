@@ -172,8 +172,7 @@ def train():
             'Actual Hours': y_test.flatten().round(2),
             'Predicted Hours': predictions.flatten().round(2)
         })
-        comparison['Error (Minutes)'] = (np.abs(comparison['Actual Hours'] - comparison['Predicted Hours']) * 60).round(
-            0)
+        comparison['Error (Minutes)'] = (np.abs(comparison['Actual Hours'] - comparison['Predicted Hours']) * 60).round(0)
 
         print("\n=== ACTUAL VS PREDICTED ===")
         print(comparison.tail(10)*10)
@@ -183,9 +182,25 @@ def train():
     show_comparison(clr, X_test, y_test)
 
     return clr
+    # FOR BIULD-IN MODELS COMPARISON
+def save_model_results(model, X_test, y_test):
+    predictions = model.predict(X_test)
+        
+    actual_hours = y_test.flatten()
+    predicted_hours = predictions.flatten()
+
+    df_to_save = pd.DataFrame({
+        'Model': ['Custom_NN'] * len(actual_hours),
+        'Actual_Hours': actual_hours,
+        'Predicted_Hours': predicted_hours,
+        'MAE': np.abs(actual_hours - predicted_hours)
+    })
+
+    df_to_save.to_csv("test_models/default_regression_results.csv", index=False)
+
 
 clr = train()
-
+save_model_results(clr, X[1600:], y[1600:])
 # TESTING THE MODEL
 import io
 
@@ -271,9 +286,9 @@ def test_regression_params():
 
     return df
 
-df_results = test_regression_params()
+#df_results = test_regression_params()
 
 # === SAVE RESULTS TO FILE
-df_results.to_csv("test_results/regression/regression_param_tests_results.csv", index=False)
+#df_results.to_csv("test_results/regression/regression_param_tests_results.csv", index=False)
 
-best_results = df_results.sort_values("MAE").head(10)
+#best_results = df_results.sort_values("MAE").head(10)

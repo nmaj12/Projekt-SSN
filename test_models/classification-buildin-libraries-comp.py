@@ -1,27 +1,33 @@
 import pandas as pd
 import numpy as np
-from sklearn.neural_network import MLPRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import r2_score, mean_absolute_error
+from sklearn.metrics import accuracy_score, f1_score
 
-def regression_buildin_models_comparison():
+def classification_buildin_models_comparison():
     # PREPARING DATA
 
     data = pd.read_csv("../digital_diet_mental_health.csv")
     data = data.sample(frac=1).reset_index(drop=True)
+
     data = data.drop('user_id', axis=1)
-
     data = pd.get_dummies(data, columns=['gender', 'location_type'])
+    data = data.astype(float)
 
-    data['stress_phone_interaction'] = data['stress_level'] * data['phone_usage_hours']
-    data['total_digital_load'] = data['phone_usage_hours'] + data['laptop_usage_hours'] + data['gaming_hours']
+    data = (data - data.mean()) / data.std()
 
-    y = data['sleep_duration_hours'].values
-    X = data.drop(columns='sleep_duration_hours').values
+    data['is_depressed'] = np.where(
+        (data['mental_health_score'] < 0.4) |
+        (data['stress_level'] > 0.7) |
+        (data['weekly_anxiety_score'] > 0.8),
+        1.0, 0.0)
+
+    y = data['is_depressed'].values
+    X = data.drop('is_depressed', axis=1).values
 
     # SPLITING INTO TRAIN AND TEST DATASETS
     X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=1, test_size=0.2)
@@ -30,25 +36,24 @@ def regression_buildin_models_comparison():
     sc_X = MinMaxScaler()
     X_trainscaled=sc_X.fit_transform(X_train)
     X_testscaled=sc_X.transform(X_test)
-
+    
     # MODELS
     models = {
-            "Linear Regression": LinearRegression(),
-            "K-Nearest Neighbors": KNeighborsRegressor(n_neighbors=5),
-            "Random Forest": RandomForestRegressor(n_estimators=100, random_state=1),
-            "MLP Regressor (NN)": MLPRegressor(
+            "Logistic Regression": LogisticRegression(),
+            "K-Nearest Neighbors": KNeighborsClassifier(n_neighbors=5),
+            "Random Forest": RandomForestClassifier(n_estimators=100, random_state=1),
+            "MLP Classifier (NN)": MLPClassifier(
                 hidden_layer_sizes=(128, 64), 
                 learning_rate_init=0.005,
                 batch_size=32,
                 activation='relu', 
                 solver='adam', 
                 max_iter=2000, 
-                momentum=0.9,
                 early_stopping=True, 
                 random_state=1
             )
         }
-
+    
     # TRENING
     results_list = []
 
@@ -57,31 +62,31 @@ def regression_buildin_models_comparison():
         model.fit(X_trainscaled, y_train)
         preds = model.predict(X_testscaled)
         
-        r2 = r2_score(y_test, preds)
-        mae = mean_absolute_error(y_test, preds)
+        acc = accuracy_score(y_test, preds)
+        f1 = f1_score(y_test, preds)
         
         results_list.append({
             "Model": name, 
-            "R2 Score": r2, 
-            "MAE (h)": mae
+            "Accuracy": acc, 
+            "F1-Score": f1
         })
 
     # ADDING MY NN 
-    my_custom_results = pd.read_csv("default_regression_results.csv")
+        my_results = pd.read_csv("default_classification_results.csv")
+        my_acc = accuracy_score(my_results['Actual_Status'], my_results['Predicted_Status'])
+        my_f1 = f1_score(my_results['Actual_Status'], my_results['Predicted_Status'])
 
-    my_r2 = r2_score(my_custom_results['Actual_Hours'], my_custom_results['Predicted_Hours'])
-    my_mae = my_custom_results['MAE'].mean()
 
     results_list.append({
         "Model": "My Custom NN", 
-        "R2 Score": my_r2, 
-        "MAE (h)": my_mae
+            "Accuracy": my_acc, 
+            "F1-Score": my_f1
     })
 
     # 5. BEST RESULTS
     df_results = pd.DataFrame(results_list)
     # SORTING BY R2
-    df_results = df_results.sort_values(by="R2 Score", ascending=False).reset_index(drop=True)
+    df_results = df_results.sort_values(by="Accuracy", ascending=False).reset_index(drop=True)
 
     print("BEST MODELS:")
     print("=" * 60)
@@ -93,4 +98,4 @@ def regression_buildin_models_comparison():
     
     return df_results
 
-regression_buildin_models_comparison()
+classification_buildin_models_comparison()
