@@ -1,0 +1,53 @@
+model,param_name,param_value,train_mae,test_mae
+Linear Regression,default,default,0.9664,0.9986
+K-Nearest Neighbors,default,default,0.8757,1.1067
+Random Forest,default,default,0.3709,0.9965
+MLP Regressor (NN),default,default,0.9717,1.0325
+Linear Regression,regularization,None (OLS),0.9664,0.9986
+Linear Regression,Ridge alpha,0.01,0.9664,0.9986
+Linear Regression,Ridge alpha,0.1,0.9664,0.9985
+Linear Regression,Ridge alpha,1.0,0.9664,0.9977
+Linear Regression,Ridge alpha,10.0,0.9667,0.9932
+Linear Regression,Lasso alpha,0.001,0.9663,0.9948
+Linear Regression,Lasso alpha,0.01,0.9702,0.979
+Linear Regression,Lasso alpha,0.1,0.9749,0.9774
+Linear Regression,Lasso alpha,1.0,0.9749,0.9774
+K-Nearest Neighbors,n_neighbors,1,0.0,1.4135
+K-Nearest Neighbors,n_neighbors,3,0.7826,1.1213
+K-Nearest Neighbors,n_neighbors,5,0.8757,1.1067
+K-Nearest Neighbors,n_neighbors,10,0.9214,1.0206
+K-Nearest Neighbors,n_neighbors,20,0.9474,1.0088
+K-Nearest Neighbors,weights,uniform,0.8757,1.1067
+K-Nearest Neighbors,weights,distance,0.0,1.1064
+K-Nearest Neighbors,metric,euclidean,0.8757,1.1067
+K-Nearest Neighbors,metric,manhattan,0.884,1.0816
+K-Nearest Neighbors,metric,chebyshev,0.8577,1.0437
+K-Nearest Neighbors,metric,minkowski,0.8757,1.1067
+Random Forest,n_estimators,10,0.4115,1.047
+Random Forest,n_estimators,50,0.3754,1.0016
+Random Forest,n_estimators,100,0.3709,0.9965
+Random Forest,n_estimators,200,0.3676,0.9945
+Random Forest,max_depth,None,0.3709,0.9965
+Random Forest,max_depth,3,0.9483,0.9856
+Random Forest,max_depth,5,0.8993,0.9898
+Random Forest,max_depth,10,0.6555,0.9989
+Random Forest,min_samples_leaf,1,0.3709,0.9965
+Random Forest,min_samples_leaf,2,0.4077,0.9935
+Random Forest,min_samples_leaf,5,0.5717,0.9953
+Random Forest,min_samples_leaf,10,0.729,0.9956
+MLP Regressor (NN),hidden_layer_sizes,"(64,)",0.9504,1.0163
+MLP Regressor (NN),hidden_layer_sizes,"(128, 64)",0.9238,1.0432
+MLP Regressor (NN),hidden_layer_sizes,"(128, 64, 32)",0.9489,1.0327
+MLP Regressor (NN),hidden_layer_sizes,"(256, 128, 64)",0.9291,1.0336
+MLP Regressor (NN),learning_rate_init,0.01,0.9782,1.0236
+MLP Regressor (NN),learning_rate_init,0.005,0.9693,1.0158
+MLP Regressor (NN),learning_rate_init,0.001,0.9745,1.0264
+MLP Regressor (NN),learning_rate_init,0.0005,0.9775,1.0306
+MLP Regressor (NN),activation,relu,0.9745,1.0264
+MLP Regressor (NN),activation,tanh,0.9771,1.0155
+MLP Regressor (NN),activation,logistic,0.983,0.9993
+MLP Regressor (NN),activation,identity,0.9952,1.0425
+MLP Regressor (NN),batch_size,16,0.9731,1.0236
+MLP Regressor (NN),batch_size,32,0.9686,1.0223
+MLP Regressor (NN),batch_size,64,0.9628,1.0186
+MLP Regressor (NN),batch_size,128,0.9704,1.0243

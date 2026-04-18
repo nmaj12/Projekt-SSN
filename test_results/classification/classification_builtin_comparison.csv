@@ -1,0 +1,57 @@
+model,train_accuracy,test_accuracy,f1_score,param_name,param_value
+Logistic Regression,0.9019,0.925,0.9541,default,default
+K-Nearest Neighbors,0.8875,0.8125,0.8889,default,default
+Random Forest,1.0,1.0,1.0,default,default
+MLP Classifier (NN),0.975,0.9375,0.9616,default,default
+Logistic Regression,0.8137,0.8025,0.8904,C,0.01
+Logistic Regression,0.8762,0.8725,0.9264,C,0.1
+Logistic Regression,0.9019,0.925,0.9541,C,1.0
+Logistic Regression,0.9087,0.9225,0.9524,C,10.0
+Logistic Regression,0.9081,0.9175,0.9492,C,100.0
+Logistic Regression,0.9019,0.925,0.9541,solver,lbfgs
+Logistic Regression,0.9031,0.925,0.9541,solver,liblinear
+Logistic Regression,0.9012,0.925,0.9541,solver,saga
+Logistic Regression,0.9012,0.925,0.9541,solver,newton-cg
+Logistic Regression,0.9044,0.9225,0.9524,penalty,l1
+Logistic Regression,0.9019,0.925,0.9541,penalty,l2
+Logistic Regression,0.9044,0.925,0.954,penalty,elasticnet
+Logistic Regression,0.9081,0.9175,0.9492,penalty,None
+K-Nearest Neighbors,1.0,0.795,0.8719,n_neighbors,1
+K-Nearest Neighbors,0.9175,0.8,0.8784,n_neighbors,3
+K-Nearest Neighbors,0.8875,0.8125,0.8889,n_neighbors,5
+K-Nearest Neighbors,0.8812,0.81,0.8902,n_neighbors,10
+K-Nearest Neighbors,0.845,0.815,0.8955,n_neighbors,20
+K-Nearest Neighbors,0.8875,0.8125,0.8889,weights,uniform
+K-Nearest Neighbors,1.0,0.8125,0.8889,weights,distance
+K-Nearest Neighbors,0.8875,0.8125,0.8889,metric,euclidean
+K-Nearest Neighbors,0.8981,0.8275,0.8972,metric,manhattan
+K-Nearest Neighbors,0.8662,0.795,0.8801,metric,chebyshev
+K-Nearest Neighbors,0.8875,0.8125,0.8889,metric,minkowski
+Random Forest,1.0,1.0,1.0,n_estimators,10
+Random Forest,1.0,1.0,1.0,n_estimators,50
+Random Forest,1.0,1.0,1.0,n_estimators,100
+Random Forest,1.0,1.0,1.0,n_estimators,200
+Random Forest,1.0,1.0,1.0,max_depth,None
+Random Forest,0.8137,0.8025,0.8904,max_depth,3
+Random Forest,0.9994,0.99,0.9938,max_depth,5
+Random Forest,1.0,1.0,1.0,max_depth,10
+Random Forest,1.0,1.0,1.0,min_samples_leaf,1
+Random Forest,1.0,1.0,1.0,min_samples_leaf,2
+Random Forest,1.0,1.0,1.0,min_samples_leaf,5
+Random Forest,1.0,1.0,1.0,min_samples_leaf,10
+MLP Classifier (NN),0.8137,0.8025,0.8904,hidden_layer_sizes,"(64,)"
+MLP Classifier (NN),0.9081,0.9025,0.9384,hidden_layer_sizes,"(128, 64)"
+MLP Classifier (NN),0.92,0.915,0.9474,hidden_layer_sizes,"(128, 64, 32)"
+MLP Classifier (NN),0.9075,0.91,0.9446,hidden_layer_sizes,"(256, 128, 64)"
+MLP Classifier (NN),0.9044,0.9175,0.9501,learning_rate_init,0.01
+MLP Classifier (NN),0.8981,0.895,0.9381,learning_rate_init,0.005
+MLP Classifier (NN),0.8137,0.8025,0.8904,learning_rate_init,0.001
+MLP Classifier (NN),0.8119,0.8025,0.8904,learning_rate_init,0.0005
+MLP Classifier (NN),0.8137,0.8025,0.8904,activation,relu
+MLP Classifier (NN),0.8137,0.8025,0.8904,activation,tanh
+MLP Classifier (NN),0.8137,0.8025,0.8904,activation,logistic
+MLP Classifier (NN),0.8137,0.8025,0.8904,activation,identity
+MLP Classifier (NN),0.9012,0.91,0.945,batch_size,16
+MLP Classifier (NN),0.9019,0.9025,0.9415,batch_size,32
+MLP Classifier (NN),0.8969,0.89,0.9351,batch_size,64
+MLP Classifier (NN),0.8888,0.8875,0.9339,batch_size,128

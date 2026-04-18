@@ -12,24 +12,25 @@ def regression_buildin_models_comparison():
     # PREPARING DATA
 
     data = pd.read_csv("../digital_diet_mental_health.csv")
-    data = data.sample(frac=1).reset_index(drop=True)
     data = data.drop('user_id', axis=1)
 
     data = pd.get_dummies(data, columns=['gender', 'location_type'])
+    data = data.reindex(sorted(data.columns), axis=1)
 
     data['stress_phone_interaction'] = data['stress_level'] * data['phone_usage_hours']
     data['total_digital_load'] = data['phone_usage_hours'] + data['laptop_usage_hours'] + data['gaming_hours']
 
-    y = data['sleep_duration_hours'].values
+    y = data['sleep_duration_hours'].values / 10.0
     X = data.drop(columns='sleep_duration_hours').values
 
     # SPLITING INTO TRAIN AND TEST DATASETS
-    X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=1, test_size=0.2)
+    X_train, X_test = X[:1600], X[1600:]
+    y_train, y_test = y[:1600], y[1600:]
 
     # SCALING
     sc_X = MinMaxScaler()
-    X_trainscaled=sc_X.fit_transform(X_train)
-    X_testscaled=sc_X.transform(X_test)
+    X_trainscaled = sc_X.fit_transform(X_train)
+    X_testscaled = sc_X.transform(X_test)
 
     # MODELS
     models = {
@@ -57,31 +58,26 @@ def regression_buildin_models_comparison():
         model.fit(X_trainscaled, y_train)
         preds = model.predict(X_testscaled)
         
-        r2 = r2_score(y_test, preds)
-        mae = mean_absolute_error(y_test, preds)
+        mae = mean_absolute_error(y_test, preds)*10
         
         results_list.append({
             "Model": name, 
-            "R2 Score": r2, 
             "MAE (h)": mae
         })
 
-    # ADDING MY NN 
+    # ADDING MY NN
     my_custom_results = pd.read_csv("default_regression_results.csv")
-
-    my_r2 = r2_score(my_custom_results['Actual_Hours'], my_custom_results['Predicted_Hours'])
-    my_mae = my_custom_results['MAE'].mean()
+    my_mae = mean_absolute_error(my_custom_results['Actual_Hours'], my_custom_results['Predicted_Hours'])
 
     results_list.append({
-        "Model": "My Custom NN", 
-        "R2 Score": my_r2, 
-        "MAE (h)": my_mae
-    })
+            "Model": "My Custom NN", 
+            "MAE (h)": my_mae
+        })
 
     # 5. BEST RESULTS
     df_results = pd.DataFrame(results_list)
     # SORTING BY R2
-    df_results = df_results.sort_values(by="R2 Score", ascending=False).reset_index(drop=True)
+    df_results = df_results.sort_values(by="MAE (h)", ascending=True).reset_index(drop=True)
 
     print("BEST MODELS:")
     print("=" * 60)

@@ -10,7 +10,7 @@ pd.set_option('display.max_columns', None)
 
 # === PREPARING DATA
 data = pd.read_csv("digital_diet_mental_health.csv")
-data = data.sample(frac=1).reset_index(drop=True)
+#data = data.sample(frac=1).reset_index(drop=True)
 
 data = data.drop('user_id', axis=1)
 data = pd.get_dummies(data, columns=['gender', 'location_type'])
@@ -186,8 +186,8 @@ def train():
 def save_model_results(model, X_test, y_test):
     predictions = model.predict(X_test)
         
-    actual_hours = y_test.flatten()
-    predicted_hours = predictions.flatten()
+    actual_hours = y_test.flatten()*10
+    predicted_hours = predictions.flatten()*10
 
     df_to_save = pd.DataFrame({
         'Model': ['Custom_NN'] * len(actual_hours),

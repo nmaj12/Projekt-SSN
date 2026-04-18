@@ -8,11 +8,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score, f1_score
 
+
+
+
 def classification_buildin_models_comparison():
     # PREPARING DATA
 
     data = pd.read_csv("../digital_diet_mental_health.csv")
-    data = data.sample(frac=1).reset_index(drop=True)
 
     data = data.drop('user_id', axis=1)
     data = pd.get_dummies(data, columns=['gender', 'location_type'])
