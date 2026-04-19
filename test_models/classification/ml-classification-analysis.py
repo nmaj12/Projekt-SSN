@@ -34,7 +34,7 @@ warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
-os.makedirs("../test_results/classification", exist_ok=True)
+os.makedirs("../../test_results/classification", exist_ok=True)
 
 
 # ===================================================================
@@ -42,7 +42,7 @@ os.makedirs("../test_results/classification", exist_ok=True)
 # ===================================================================
 
 def prepare_data():
-    data = pd.read_csv("../digital_diet_mental_health.csv")
+    data = pd.read_csv("../../Data/digital_diet_mental_health.csv")
     data = data.sample(frac=1, random_state=1).reset_index(drop=True)
 
     data = data.drop('user_id', axis=1)
@@ -387,7 +387,7 @@ def main():
     df = pd.DataFrame(all_results)
 
     # Zapis do CSV
-    out_path = "../test_results/classification/classification_builtin_comparison.csv"
+    out_path = "../../test_results/classification/classification_builtin_comparison.csv"
     df.to_csv(out_path, index=False)
     print(f"\nWszystkie wyniki zapisane do: {out_path}")
 

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 def regression_model_test():
-    data = pd.read_csv("../digital_diet_mental_health.csv")
+    data = pd.read_csv("../../Data/digital_diet_mental_health.csv")
     data = data.sample(frac=1).reset_index(drop=True)
 
     data = data.drop('user_id', axis=1)
@@ -179,6 +179,6 @@ def regression_model_test():
         return pd.DataFrame(results)
 
     df = run_full_analysis()
-    df.to_csv("../test_results/regression/singular_regression_param_tests_results.csv", index=False)
+    df.to_csv("../../test_results/regression/singular_regression_param_tests_results.csv", index=False)
 
 regression_model_test()

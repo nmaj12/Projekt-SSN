@@ -14,7 +14,7 @@ from sklearn.metrics import accuracy_score, f1_score
 def classification_buildin_models_comparison():
     # PREPARING DATA
 
-    data = pd.read_csv("../digital_diet_mental_health.csv")
+    data = pd.read_csv("../../Data/digital_diet_mental_health.csv")
 
     data = data.drop('user_id', axis=1)
     data = pd.get_dummies(data, columns=['gender', 'location_type'])
@@ -74,7 +74,7 @@ def classification_buildin_models_comparison():
         })
 
     # ADDING MY NN 
-        my_results = pd.read_csv("default_classification_results.csv")
+        my_results = pd.read_csv("../../test_results/classification/default_classification_results.csv")
         my_acc = accuracy_score(my_results['Actual_Status'], my_results['Predicted_Status'])
         my_f1 = f1_score(my_results['Actual_Status'], my_results['Predicted_Status'])
 

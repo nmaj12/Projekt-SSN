@@ -8,7 +8,7 @@ pd.set_option('display.max_columns', None)
 
 
 # === PREPARING DATA
-data = pd.read_csv("digital_diet_mental_health.csv")
+data = pd.read_csv("../Data/digital_diet_mental_health.csv")
 data = data.sample(frac=1).reset_index(drop=True)
 
 data = data.drop('user_id', axis=1)
@@ -16,6 +16,7 @@ data = pd.get_dummies(data, columns=['gender', 'location_type'])
 data = data.astype(float)
 
 data = (data - data.mean()) / data.std()
+print(f"Mediana: {data['mental_health_score'].median()}")
 
 data['is_depressed'] = np.where(
     (data['mental_health_score'] < 0.4) |
@@ -196,7 +197,7 @@ def save_classification_results(model, X_test, y_test):
         'Correct': (actuals == predictions).astype(int)
     })
 
-    df_to_save.to_csv("test_models/default_classification_results.csv", index=False)
+    df_to_save.to_csv("../test_results/classification/default_classification_results.csv", index=False)
     
     accuracy = (actuals == predictions).mean() * 100
 

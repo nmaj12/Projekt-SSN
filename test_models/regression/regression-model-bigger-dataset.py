@@ -8,7 +8,7 @@ Testing our model for regression using dataset with more records (15,000 synthet
 pd.set_option('display.max_columns', None)
 
 # === PREPARING DATA
-data = pd.read_csv("sleep_mobile_stress_dataset_15000.csv")
+data = pd.read_csv("../../Data/sleep_mobile_stress_dataset_15000.csv")
 data = data.sample(frac=1).reset_index(drop=True)
 
 data = data.drop('user_id', axis=1)

@@ -9,7 +9,7 @@ import numpy as np
 pd.set_option('display.max_columns', None)
 
 # === PREPARING DATA
-data = pd.read_csv("digital_diet_mental_health.csv")
+data = pd.read_csv("../Data/digital_diet_mental_health.csv")
 #data = data.sample(frac=1).reset_index(drop=True)
 
 data = data.drop('user_id', axis=1)
@@ -196,7 +196,7 @@ def save_model_results(model, X_test, y_test):
         'MAE': np.abs(actual_hours - predicted_hours)
     })
 
-    df_to_save.to_csv("test_models/default_regression_results.csv", index=False)
+    df_to_save.to_csv("../test_results/regression/default_regression_results.csv", index=False)
 
 
 clr = train()

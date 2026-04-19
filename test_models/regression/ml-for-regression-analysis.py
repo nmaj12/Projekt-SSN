@@ -25,7 +25,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import r2_score, mean_absolute_error
 
-os.makedirs("../test_results/regression", exist_ok=True)
+
+os.makedirs("../../test_results/regression", exist_ok=True)
 
 
 # ===================================================================
@@ -33,7 +34,7 @@ os.makedirs("../test_results/regression", exist_ok=True)
 # ===================================================================
 
 def prepare_data():
-    data = pd.read_csv("../digital_diet_mental_health.csv")
+    data = pd.read_csv("../../Data/digital_diet_mental_health.csv")
     data = data.sample(frac=1, random_state=42).reset_index(drop=True)
     data = data.drop('user_id', axis=1)
 
@@ -333,7 +334,7 @@ def main():
 
     df = pd.DataFrame(all_results)
 
-    out_path = "../test_results/regression/regression_builtin_comparison.csv"
+    out_path = "../../test_results/regression/regression_builtin_comparison.csv"
     df.to_csv(out_path, index=False)
     print(f"\nWszystkie wyniki zapisane do: {out_path}")
 
