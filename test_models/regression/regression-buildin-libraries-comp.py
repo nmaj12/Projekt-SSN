@@ -11,7 +11,7 @@ from sklearn.metrics import r2_score, mean_absolute_error
 def regression_buildin_models_comparison():
     # PREPARING DATA
 
-    data = pd.read_csv("../../Data/digital_diet_mental_health.csv")
+    data = pd.read_csv("D:\personal-projects\Projekt-SSN\Data\digital_diet_mental_health.csv")
     data = data.drop('user_id', axis=1)
 
     data = pd.get_dummies(data, columns=['gender', 'location_type'])
@@ -66,7 +66,7 @@ def regression_buildin_models_comparison():
         })
 
     # ADDING MY NN
-    my_custom_results = pd.read_csv("../../test_results/regression/default_regression_results.csv")
+    my_custom_results = pd.read_csv("../test_results/regression/default_regression_results.csv")
     my_mae = mean_absolute_error(my_custom_results['Actual_Hours'], my_custom_results['Predicted_Hours'])
 
     results_list.append({

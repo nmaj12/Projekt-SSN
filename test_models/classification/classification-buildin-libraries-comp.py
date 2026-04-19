@@ -14,7 +14,7 @@ from sklearn.metrics import accuracy_score, f1_score
 def classification_buildin_models_comparison():
     # PREPARING DATA
 
-    data = pd.read_csv("../../Data/digital_diet_mental_health.csv")
+    data = pd.read_csv("D:\personal-projects\Projekt-SSN\Data\digital_diet_mental_health.csv")
 
     data = data.drop('user_id', axis=1)
     data = pd.get_dummies(data, columns=['gender', 'location_type'])
