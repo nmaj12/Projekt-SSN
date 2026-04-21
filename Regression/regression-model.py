@@ -1,7 +1,5 @@
 """
-=======================================================================
   MODEL REGRESYJNY — Przewidywanie długości snu
-=======================================================================
   Cel: Na podstawie poziomu stresu, czasu ekranowego, aktywności itp. sieć neuronowa przewiduje ile godzin śpi dana osoba.
 
   Architektura:
@@ -13,7 +11,6 @@
   Optymalizacja: SGD z mini-batchami + Momentum (β = 0.9)
   Funkcja straty: MSE (Mean Squared Error)
   Metryka: MAE (Mean Absolute Error) w godzinach
-  # --------------------------------------------------------------------
 """
 
 import pandas as pd
@@ -21,9 +18,7 @@ import numpy as np
 
 pd.set_option('display.max_columns', None)
 
-# --------------------------------------------------------------------
-# READING & PREPARING DATA
-# --------------------------------------------------------------------
+# READING AND PREPARING DATA
 data = pd.read_csv("../data/digital_diet_mental_health.csv")
 data = data.sample(frac=1).reset_index(drop=True)
 
@@ -44,9 +39,7 @@ X = data.drop(columns='sleep_duration_hours').values
 
 rows, cols = X.shape
 
-# --------------------------------------------------------------------
 # NEURAL NETWORK Definition
-# --------------------------------------------------------------------
 class Sleep_Prediction:
     """
     A multilayer neural network for linear regression
@@ -176,9 +169,8 @@ class Sleep_Prediction:
     def score(self, predict, y):
         return np.mean(np.abs(predict - y))
 
-# --------------------------------------------------------------------
 # TRAINING THE MODEL
-# --------------------------------------------------------------------
+
 def train():
     X_train = X[:1600]
     X_test = X[1600:]
@@ -216,9 +208,9 @@ def train():
 
     return model
 
-# --------------------------------------------------------------------
+
 # TESTING THE MODEL on different data
-# --------------------------------------------------------------------
+
 import io
 
 csv_data = """user_id,age,gender,daily_screen_time_hours,phone_usage_hours,laptop_usage_hours,tablet_usage_hours,tv_usage_hours,social_media_hours,work_related_hours,entertainment_hours,gaming_hours,sleep_duration_hours,sleep_quality,mood_rating,stress_level,physical_activity_hours_per_week,location_type,mental_health_score,uses_wellness_apps,eats_healthy,caffeine_intake_mg_per_day,weekly_anxiety_score,weekly_depression_score,mindfulness_minutes_per_day
@@ -255,9 +247,9 @@ def predict_new_users(model, new_data, original_df):
     for i, hours in enumerate(predictions):
         print(f"User {i + 1}: Predicted {hours[0]:.2f} hours of sleep")
 
-# --------------------------------------------------------------------
+
 # PARAMETRIC TESTS - Grid Search
-# --------------------------------------------------------------------
+
 def test_regression_params():
     learning_rates = [0.01, 0.008, 0.005, 0.001]
     hidden_units_list = [64, 128, 256, 512]
@@ -309,9 +301,9 @@ def test_regression_params():
 
     return df
 
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
+
+
+
 def main_func():
     clr = train()
     predict_new_users(clr, new_samples, real_data)

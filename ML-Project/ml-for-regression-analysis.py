@@ -1,18 +1,12 @@
 """
-=======================================================================
-  PORÓWNANIE MODELI REGRESYJNYCH — Biblioteki sklearn
-=======================================================================
-  Cel: Porównanie skuteczności modeli uczenia maszynowego w zadaniu przewidywania długości snu (regresja).
+  PORÓWNANIE MODELI REGRESYJNYCH
 
   Modele:
-    1. Regresja Liniowa         (parametry: fit_intercept, normalize via scaling)
-    2. k-Najbliższych Sąsiadów  (parametry: n_neighbors, weights, metric)
-    3. Las Losowy               (parametry: n_estimators, max_depth, min_samples_leaf)
-    4. MLP Regressor (NN)       (parametry: hidden_layer_sizes, learning_rate_init)
-
-  Metryki: MAE w godzinach
-  Wyniki zapisywane do CSV z uwzględnieniem train i test.
-======"""
+    1. Regresja Liniowa         (parametry: model, alpha (regularyzacja Ridge), alpha (regularyzacja Lasso))
+    2. k-Najbliższych Sąsiadów  (parametry: liczba sasiadow, weights, metric)
+    3. Las Losowy               (parametry: ilosc drzew, glebokosc drzew, ilosc lisci)
+    4. MLP Regressor (NN)       (parametry: warstwy ukryte, tempo uczenia, funkcja aktywacji, rozmiar batcha)
+"""
 
 import pandas as pd
 import numpy as np
@@ -28,10 +22,7 @@ from sklearn.metrics import r2_score, mean_absolute_error
 
 os.makedirs("../test_results/regression", exist_ok=True)
 
-
-# ===================================================================
-#  1. PRZYGOTOWANIE DANYCH
-# ===================================================================
+#  przygotowanie danych
 
 def prepare_data():
     data = pd.read_csv("../Data/digital_diet_mental_health.csv")
@@ -40,7 +31,6 @@ def prepare_data():
 
     data = pd.get_dummies(data, columns=['gender', 'location_type'])
 
-    # Feature engineering (jak w modelu własnym)
     data['stress_phone_interaction'] = data['stress_level'] * data['phone_usage_hours']
     data['total_digital_load'] = (
         data['phone_usage_hours'] +
@@ -60,14 +50,11 @@ def prepare_data():
     X_test  = scaler.transform(X_test)
 
     print(f"[Dane] Train: {X_train.shape} | Test: {X_test.shape}")
-    print(f"[Dane] Zakres snu: {y.min():.1f} – {y.max():.1f} h  |  Śr.: {y.mean():.2f} h\n")
 
     return X_train, X_test, y_train, y_test
 
 
-# ===================================================================
-#  2. PORÓWNANIE MODELI Z DOMYŚLNYMI PARAMETRAMI
-# ===================================================================
+#  porównanie modeli z domyślnymi parametrami
 
 def compare_default_models(X_train, X_test, y_train, y_test):
     models = {
@@ -110,22 +97,19 @@ def compare_default_models(X_train, X_test, y_train, y_test):
     return results
 
 
-# ===================================================================
-#  3. ANALIZA PARAMETRÓW — REGRESJA LINIOWA / RIDGE / LASSO
-# ===================================================================
+#  analiza parametrów - regresją liniowa
 
 def test_linear_regression(X_train, X_test, y_train, y_test):
     """
     Testowane parametry:
-      • typ modelu: [OLS, Ridge z różnym alpha, Lasso z różnym alpha]
-      • alpha (regularyzacja Ridge): [0.01, 0.1, 1.0, 10.0]
-      • alpha (regularyzacja Lasso): [0.001, 0.01, 0.1, 1.0]
+        - typ modelu: [OLS, Ridge z różnym alpha, Lasso z różnym alpha]
+        - alpha (regularyzacja Ridge): [0.01, 0.1, 1.0, 10.0]
+        - alpha (regularyzacja Lasso): [0.001, 0.01, 0.1, 1.0]
     """
     results = []
 
-    print("\n[Linear Regression] Testowanie wariantów regularyzacji...")
+    print("\n[Linear Regression] Testowanie wariantów regularyzacji")
 
-    # Brak regularyzacji
     model = LinearRegression()
     model.fit(X_train, y_train)
     results.append({
@@ -137,7 +121,7 @@ def test_linear_regression(X_train, X_test, y_train, y_test):
     })
 
     # Ridge
-    print("[Linear Regression] Testowanie parametru alpha (Ridge)...")
+    print("[Linear Regression] Testowanie parametru alpha (Ridge)")
     for alpha in [0.01, 0.1, 1.0, 10.0]:
         model = Ridge(alpha=alpha)
         model.fit(X_train, y_train)
@@ -150,7 +134,7 @@ def test_linear_regression(X_train, X_test, y_train, y_test):
         })
 
     # Lasso
-    print("[Linear Regression] Testowanie parametru alpha (Lasso)...")
+    print("[Linear Regression] Testowanie parametru alpha (Lasso)")
     for alpha in [0.001, 0.01, 0.1, 1.0]:
         model = Lasso(alpha=alpha, max_iter=5000)
         model.fit(X_train, y_train)
@@ -165,14 +149,20 @@ def test_linear_regression(X_train, X_test, y_train, y_test):
     return results
 
 
-# ===================================================================
-#  4. ANALIZA PARAMETRÓW — K-NEAREST NEIGHBORS
-# ===================================================================
+
+#  analiza parametrów - k-najblizszych sasiadów
+
 
 def test_knn(X_train, X_test, y_train, y_test):
+    '''
+    Testowane parametry:
+        - Liczba sąsiadów: [1, 3, 5, 10, 20]
+        - Weights: ['uniform', 'distance']
+        - Metric: ['euclidean', 'manhattan', 'chebyshev', 'minkowski']
+    '''
     results = []
 
-    print("\n[KNN] Testowanie parametru n_neighbors...")
+    print("\n[KNN] Testowanie parametru n_neighbors")
     for k in [1, 3, 5, 10, 20]:
         model = KNeighborsRegressor(n_neighbors=k)
         model.fit(X_train, y_train)
@@ -184,7 +174,7 @@ def test_knn(X_train, X_test, y_train, y_test):
             "test_mae":    round(mean_absolute_error(y_test,  model.predict(X_test)),  4),
         })
 
-    print("[KNN] Testowanie parametru weights...")
+    print("[KNN] Testowanie parametru weights")
     for w in ['uniform', 'distance']:
         model = KNeighborsRegressor(n_neighbors=5, weights=w)
         model.fit(X_train, y_train)
@@ -196,7 +186,7 @@ def test_knn(X_train, X_test, y_train, y_test):
             "test_mae":    round(mean_absolute_error(y_test,  model.predict(X_test)),  4),
         })
 
-    print("[KNN] Testowanie parametru metric...")
+    print("[KNN] Testowanie parametru metric")
     for metric in ['euclidean', 'manhattan', 'chebyshev', 'minkowski']:
         model = KNeighborsRegressor(n_neighbors=5, metric=metric)
         model.fit(X_train, y_train)
@@ -211,14 +201,18 @@ def test_knn(X_train, X_test, y_train, y_test):
     return results
 
 
-# ===================================================================
-#  5. ANALIZA PARAMETRÓW — RANDOM FOREST
-# ===================================================================
+#  analiza parametrów - las losowy
 
 def test_random_forest(X_train, X_test, y_train, y_test):
+    """
+    Testowane parametry:
+        - Ilość drzew: [10, 50, 100, 200]
+        - Głębokość drzewa: [None, 3, 5, 10]
+        - Ilość liści: [1, 2, 5, 10]
+    """
     results = []
 
-    print("\n[Random Forest] Testowanie parametru n_estimators...")
+    print("\n[Random Forest] Testowanie parametru n_estimators")
     for n in [10, 50, 100, 200]:
         model = RandomForestRegressor(n_estimators=n, random_state=42)
         model.fit(X_train, y_train)
@@ -230,7 +224,7 @@ def test_random_forest(X_train, X_test, y_train, y_test):
             "test_mae":    round(mean_absolute_error(y_test,  model.predict(X_test)),  4),
         })
 
-    print("[Random Forest] Testowanie parametru max_depth...")
+    print("[Random Forest] Testowanie parametru max_depth")
     for d in [None, 3, 5, 10]:
         model = RandomForestRegressor(n_estimators=100, max_depth=d, random_state=42)
         model.fit(X_train, y_train)
@@ -242,7 +236,7 @@ def test_random_forest(X_train, X_test, y_train, y_test):
             "test_mae":    round(mean_absolute_error(y_test,  model.predict(X_test)),  4),
         })
 
-    print("[Random Forest] Testowanie parametru min_samples_leaf...")
+    print("[Random Forest] Testowanie parametru min_samples_leaf")
     for msl in [1, 2, 5, 10]:
         model = RandomForestRegressor(n_estimators=100, min_samples_leaf=msl, random_state=42)
         model.fit(X_train, y_train)
@@ -257,17 +251,21 @@ def test_random_forest(X_train, X_test, y_train, y_test):
     return results
 
 
-# ===================================================================
-#  6. ANALIZA PARAMETRÓW — MLP REGRESSOR
-# ===================================================================
+#  analiza parametrów - mlp regressor
 
 def test_mlp(X_train, X_test, y_train, y_test):
+    """
+    Testowane parametry:
+        - Warstwy ukryte: [(64,), (128, 64), (128, 64, 32), (256, 128, 64)]
+        - Tempo uczenia: [0.01, 0.005, 0.001, 0.0005]
+        - Funkcja aktywacji: ['relu', 'tanh', 'logistic', 'identity']
+        - Rozmiar batcha: [16, 32, 64, 128]
+    """
     results = []
 
-    print("\n[MLP] Testowanie parametru hidden_layer_sizes...")
+    print("\n[MLP] Testowanie parametru hidden_layer_sizes")
     for hl in [(64,), (128, 64), (128, 64, 32), (256, 128, 64)]:
-        model = MLPRegressor(hidden_layer_sizes=hl, max_iter=1000,
-                             early_stopping=True, random_state=42)
+        model = MLPRegressor(hidden_layer_sizes=hl, max_iter=1000, early_stopping=True, random_state=42)
         model.fit(X_train, y_train)
         results.append({
             "model":       "MLP Regressor (NN)",
@@ -277,7 +275,7 @@ def test_mlp(X_train, X_test, y_train, y_test):
             "test_mae":    round(mean_absolute_error(y_test,  model.predict(X_test)),  4),
         })
 
-    print("[MLP] Testowanie parametru learning_rate_init...")
+    print("[MLP] Testowanie parametru learning_rate_init")
     for lr in [0.01, 0.005, 0.001, 0.0005]:
         model = MLPRegressor(learning_rate_init=lr, max_iter=1000, early_stopping=True, random_state=42)
         model.fit(X_train, y_train)
@@ -289,10 +287,9 @@ def test_mlp(X_train, X_test, y_train, y_test):
             "test_mae":    round(mean_absolute_error(y_test,  model.predict(X_test)),  4),
         })
 
-    print("[MLP] Testowanie parametru activation...")
+    print("[MLP] Testowanie parametru activation")
     for act in ['relu', 'tanh', 'logistic', 'identity']:
-        model = MLPRegressor(activation=act, max_iter=1000,
-                             early_stopping=True, random_state=42)
+        model = MLPRegressor(activation=act, max_iter=1000, early_stopping=True, random_state=42)
         model.fit(X_train, y_train)
         results.append({
             "model":       "MLP Regressor (NN)",
@@ -302,10 +299,9 @@ def test_mlp(X_train, X_test, y_train, y_test):
             "test_mae":    round(mean_absolute_error(y_test,  model.predict(X_test)),  4),
         })
 
-    print("[MLP] Testowanie parametru batch_size...")
+    print("[MLP] Testowanie parametru batch_size")
     for bs in [16, 32, 64, 128]:
-        model = MLPRegressor(batch_size=bs, max_iter=1000,
-                             early_stopping=True, random_state=42)
+        model = MLPRegressor(batch_size=bs, max_iter=1000, early_stopping=True, random_state=42)
         model.fit(X_train, y_train)
         results.append({
             "model":       "MLP Regressor (NN)",
@@ -318,9 +314,7 @@ def test_mlp(X_train, X_test, y_train, y_test):
     return results
 
 
-# ===================================================================
-#  7. URUCHOMIENIE I ZAPIS WYNIKÓW
-# ===================================================================
+#  uruchamianie i zapis wyników
 
 def main():
     X_train, X_test, y_train, y_test = prepare_data()
@@ -334,7 +328,7 @@ def main():
 
     df = pd.DataFrame(all_results)
 
-    out_path = r"D:\personal-projects\Projekt-SSN\test_results\regression\regression_builtin_comparison.csv"
+    out_path = "../test_results/regression/regression_builtin_comparison.csv"
     df.to_csv(out_path, index=False)
     print(f"\nWszystkie wyniki zapisane do: {out_path}")
 
@@ -344,6 +338,12 @@ def main():
     print("=" * 65)
     best = df.loc[df.groupby('model')['test_mae'].idxmin()]
     print(best[['model', 'param_name', 'param_value', 'test_mae']].to_string(index=False))
+
+    '''read_results = pd.read_csv("../test_results/regression/regression_builtin_comparison.csv")
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', 1000)      
+
+    print(read_results)'''
 
     return df
 

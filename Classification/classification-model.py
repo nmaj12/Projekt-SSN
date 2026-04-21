@@ -1,7 +1,5 @@
 """
-=======================================================================
   MODEL KLASYFIKACYJNY - Przewidywanie stanu zdrowia psychicznego
-=======================================================================
   Cel: Na podstawie czasu przed ekranem, snu i innych czynników klasyfikator decyduje, czy dana osoba jest psychicznie "zdrowa" czy "niezdrowa" (is_depressed: 0 lub 1).
 
   Architektura:
@@ -12,7 +10,6 @@
 
   Optymalizacja: SGD z mini-batchami + Momentum (β = 0.9)
   Funkcja straty: Binary Cross-Entropy (Log Loss)
-  # --------------------------------------------------------------------
 """
 
 import pandas as pd
@@ -20,9 +17,8 @@ import numpy as np
 
 pd.set_option('display.max_columns', None)
 
-# --------------------------------------------------------------------
 # READING & PREPARING DATA
-# --------------------------------------------------------------------
+
 data = pd.read_csv("../data/digital_diet_mental_health.csv")
 data = data.sample(frac=1).reset_index(drop=True)
 
@@ -46,9 +42,8 @@ X = data.drop('is_depressed', axis=1).values
 
 rows, cols = X.shape
 
-# --------------------------------------------------------------------
 # NEURAL NETWORK: A masterclass
-# --------------------------------------------------------------------
+
 class Mentally_Unwell_Prediction:
     """
     A multilayered neural network that binary classifies someones mental health status
@@ -196,9 +191,8 @@ class Mentally_Unwell_Prediction:
         cnt = np.sum(predict == y)
         return (cnt / len(y)) * 100
 
-# --------------------------------------------------------------------
 # TRAINING THE MODEL
-# --------------------------------------------------------------------
+
 def train(seperator=1600):
     X_train = X[:seperator]
     X_test = X[seperator:]
@@ -237,9 +231,8 @@ def train(seperator=1600):
 
     return model
 
-# --------------------------------------------------------------------
 # TESTING THE MODEL on different data
-# --------------------------------------------------------------------
+
 import io
 
 csv_data = """user_id,age,gender,daily_screen_time_hours,phone_usage_hours,laptop_usage_hours,tablet_usage_hours,tv_usage_hours,social_media_hours,work_related_hours,entertainment_hours,gaming_hours,sleep_duration_hours,sleep_quality,mood_rating,stress_level,physical_activity_hours_per_week,location_type,mental_health_score,uses_wellness_apps,eats_healthy,caffeine_intake_mg_per_day,weekly_anxiety_score,weekly_depression_score,mindfulness_minutes_per_day
@@ -276,9 +269,8 @@ def predict_new_users(model, new_data, original_df):
         status = "Unwell" if risk >= 0.5 else "Healthy"
         print(f"Test {i + 1}: Health -> Diagnose: {status}")
 
-# --------------------------------------------------------------------
+
 # PARAMETRIC TESTS - Grid Search
-# --------------------------------------------------------------------
 def test_classification_params():
     learning_rates = [0.01, 0.005, 0.003, 0.001]
     hidden_units_list = [64, 128, 256, 512]
@@ -330,9 +322,9 @@ def test_classification_params():
     df.to_csv("../test_results/classification/classification_param_tests.csv", index=False)
     return df
 
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
+
+
+
 def main_func():
     clr = train()
     predict_new_users(clr, new_samples, real_data)

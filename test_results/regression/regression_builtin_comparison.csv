@@ -21,7 +21,7 @@ K-Nearest Neighbors,weights,uniform,0.8757,1.1067
 K-Nearest Neighbors,weights,distance,0.0,1.1064
 K-Nearest Neighbors,metric,euclidean,0.8757,1.1067
 K-Nearest Neighbors,metric,manhattan,0.884,1.0816
-K-Nearest Neighbors,metric,chebyshev,0.8559,1.0408
+K-Nearest Neighbors,metric,chebyshev,0.8577,1.0437
 K-Nearest Neighbors,metric,minkowski,0.8757,1.1067
 Random Forest,n_estimators,10,0.4115,1.047
 Random Forest,n_estimators,50,0.3754,1.0016
